@@ -22,5 +22,12 @@
   },
   "include": [
     "src"
+, "lixo/context"  ],
+  "exclude": [
+    "node_modules",
+    "babel.config.ts"
+  ],
+  "files": [
+    "src/styles/styled.d.ts"
   ]
 }

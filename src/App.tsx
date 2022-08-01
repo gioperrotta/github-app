@@ -1,25 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { ThemeProvider, DefaultTheme } from 'styled-components';
+import usePesistedState from './hooks/usePersistedState';
+import GlobalStyle from './styles/global';
+import light from './styles/themes/light';
+import dark from './styles/themes/dark';
+
+import {GitUserProvider } from './context/GitUserContext';
+
+import { Header } from './components/Header';
+import { Layout } from './components/Layout';
+// import { Profile } from './components/Profile';
+// import { Repositories } from './components/Repositories';
 
 function App() {
+  const [theme, setTheme] = usePesistedState<DefaultTheme>('theme', light);
+
+  const toggleTheme = () => {
+    setTheme(theme.title === 'light' ? dark : light)
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <GitUserProvider>
+
+      <ThemeProvider theme={theme}>
+        <GlobalStyle />
+        
+        <Layout>
+        <Header toggleTheme={toggleTheme} />
+          {/* <Profile /> */}
+          {/* <Repositories /> */}
+        </Layout>
+      </ThemeProvider >
+    </GitUserProvider>
   );
 }
 
