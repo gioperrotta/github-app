@@ -21,7 +21,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleTheme }) => {
   const { colors, title } = useContext(ThemeContext);
   const [userName, setUserName] = useState('');
 
-  const { setNewUserNameToSearch } = useContext(GitUserContext);
+  const { setNewUserNameToSearch} = useContext(GitUserContext);
 
   const handleClick = () => {
     if (!userName) return;

@@ -13,8 +13,6 @@ import {
 export function Repositories() {
   const { repos, reposStarred } = useContext(GitUserContext);
 
-  console.log('EATOU AQUI Repositories 15=>', repos)
-
   return (
     <>
       <ContainerTabs

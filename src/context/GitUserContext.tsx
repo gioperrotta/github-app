@@ -20,6 +20,7 @@ type RepoType = {
 
 type ReposType = RepoType[];
 
+
 export const INITIAL_VALUE = {
   name: '',
   html_url: '',
@@ -36,6 +37,7 @@ interface GitUserProviderProps {
 }
 
 interface GitUserContextData {
+  userName: string,
   githubUser: UserType,
   repos: ReposType,
   reposStarred: ReposType,
@@ -46,62 +48,69 @@ export const GitUserContext = createContext<GitUserContextData>(
   {} as GitUserContextData
 );
 
+
 export function GitUserProvider({ children }: GitUserProviderProps) {
   const [userName, setUserName] = useState('');
   const [githubUser, setGithubUser] = useState<UserType>(INITIAL_VALUE);
   const [repos, setRepos] = useState<ReposType>([]);
   const [reposStarred, setReposStarred] = useState<ReposType>([]); 
 
-  useEffect(() => {
-    api.get(`users/${userName}`).then(({ data }) => {
-
-      const { name, html_url, avatar_url, login, repos_url } = data
-      const public_repos = Number(data.public_repos)
-      const followers = Number(data.followers)
-      const following = Number(data.following)
-
-      setGithubUser({
-        name,
-        html_url,
-        avatar_url,
-        login,
-        public_repos,
-        followers,
-        following,
-        repos_url,
-      })
+  function saveGithubUserReturned(data :any) {
+          
+    const { name, html_url, avatar_url, login, repos_url } = data
+    const public_repos = Number(data.public_repos)
+    const followers = Number(data.followers)
+    const following = Number(data.following)
+    
+    setGithubUser({
+      name,
+      html_url,
+      avatar_url,
+      login,
+      public_repos,
+      followers,
+      following,
+      repos_url,
     })
-  }, [userName]);
+  }
 
-  useEffect(() => {
-    api.get(`users/${userName}/starred`).then(({ data })  => {
-      const newReposStarred: ReposType = [];
-      data.map((item: any) => {
-        const newRepo: RepoType = {
-          name: item.name,
-          full_name: item.full_name,
-          html_url: item.html_url
-        }
-        newReposStarred.push(newRepo)
+    useEffect(() => {
+        api.get(`users/${userName}`)
+        .then(({ data }) => saveGithubUserReturned(data))
+        .catch(error => console.log('GitUserContext 01=>',error))
+      }, [userName]);
+  
+    useEffect(() => {
+      api.get(`users/${userName}/starred`).then(({ data })  => {
+        const newReposStarred: ReposType = [];
+        data.map((item: any) => {
+          const newRepo: RepoType = {
+            name: item.name,
+            full_name: item.full_name,
+            html_url: item.html_url
+          }
+          newReposStarred.push(newRepo)
+        })
+        setReposStarred(newReposStarred)
       })
-      setReposStarred(newReposStarred)
-    })
-  }, [githubUser]);
-
-  useEffect(() => {
-    api.get(githubUser.repos_url).then(({ data }) => {
-      const newRepos: ReposType = [];
-      data.map((item: any) => {
-        const newRepo: RepoType = {
-          name: item.name,
-          full_name: item.full_name,
-          html_url: item.html_url
-        }
-        newRepos.push(newRepo)
+      .catch(error => console.log('GitUserContext 02=>',error))
+    }, [userName]);
+  
+    useEffect(() => {
+      api.get(githubUser.repos_url).then(({ data }) => {
+        const newRepos: ReposType = [];
+        data.map((item: any) => {
+          const newRepo: RepoType = {
+            name: item.name,
+            full_name: item.full_name,
+            html_url: item.html_url
+          }
+          newRepos.push(newRepo)
+        })
+        setRepos(newRepos)
       })
-      setRepos(newRepos)
-    })
-  }, [githubUser]);
+      .catch(error => console.log('GitUserContext 03=>',error))
+    }, [githubUser]);
 
   function setNewUserNameToSearch(userName: string) {
     setUserName(userName);
@@ -109,7 +118,7 @@ export function GitUserProvider({ children }: GitUserProviderProps) {
 
   return (
     <GitUserContext.Provider 
-    value={{ githubUser, repos, reposStarred, setNewUserNameToSearch }}
+    value={{ userName, githubUser, repos, reposStarred, setNewUserNameToSearch }}
     >
       {children}
     </GitUserContext.Provider>

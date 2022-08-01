@@ -13,7 +13,14 @@ import {
 } from './styles'
 
 export function Profile() {
-  const { githubUser } = useContext(GitUserContext);
+  const { githubUser, userName } = useContext(GitUserContext);
+  let message = ''
+
+  if (userName !== '' && !githubUser.name){
+    message = 'Usuário não encontrado no Github'
+  } else if (userName === '' && githubUser.name === ''){
+    message = 'Busque um Usuário válido do Github '
+  }
 
   return (
     <Container>
@@ -57,7 +64,7 @@ export function Profile() {
           </ContainerStatus>
         </ContainerInfoUser> :
         <ContainerNoUser>
-          <h1> Busque um Usuário válido do Github </h1>
+          <h1>{message}</h1>
         </ContainerNoUser>
       }
     </Container>
